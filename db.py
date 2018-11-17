@@ -1,7 +1,7 @@
 import os
 from enum import Enum, unique
 
-from peewee import Model, IntegerField, PostgresqlDatabase, TextField
+from peewee import Model, IntegerField, PostgresqlDatabase, TextField, CompositeKey
 from urllib3.util import parse_url
 
 db_url = parse_url(os.getenv('DATABASE_URL'))
@@ -31,18 +31,19 @@ class UserState(Enum):
 
 
 class User(Model):
-    tg_id = IntegerField(null=True, help_text='Telegram User Id')
-    vk_id = IntegerField(null=True, help_text='VK User Id')
+    tg = IntegerField(null=True, help_text='Telegram User Id')
+    vk = IntegerField(null=True, help_text='VK User Id')
     state = IntegerField(default=UserState.authorizing.value, choices=UserState.as_choices())
     state_param = TextField(default='')
 
     def __repr__(self):
-        return '<User tg={} vk={} state={}:{}>'.format(self.tg_id, self.vk_id, self.state.name,
+        return '<User tg={} vk={} state={}:{}>'.format(self.tg, self.vk, self.state.name,
                                                        self.additional_parameter)
 
     class Meta:
         database = database
         table_name = 'app_users'
+        primary_key = CompositeKey('tg', 'vk')
 
 
 def create_tables():

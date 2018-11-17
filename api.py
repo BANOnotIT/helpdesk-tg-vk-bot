@@ -35,10 +35,10 @@ class TgApi(Api):
         self.token = token
 
     def get_nmessage(self, message):
-        user = User.get_or_none(tg_id=int(message['from']['id']))
+        user = User.get_or_none(tg=int(message['from']['id']))
         if not user:
             user = User.create()
-            user.tg_id = int(message['from']['id'])
+            user.tg = int(message['from']['id'])
             user.save()
 
         kind = TgMessage.get_kind(message)
