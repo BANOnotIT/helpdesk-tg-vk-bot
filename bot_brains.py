@@ -9,7 +9,7 @@ def process_nmessage(message: NMessage):
     cancel = message.kind is MsgType.command and message.text == '/cancel'
 
     if state is UserState.initial:
-        user.state = UserState.authorizing
+        user.state = UserState.authorizing.value
         user.state_param = ''
         user.save()
 
