@@ -4,6 +4,7 @@ from flask import Flask, request
 
 import db
 from api import TgApi
+from bot_brains import process_nmessage
 
 app = Flask(__name__)
 tg_api = TgApi('SomeToken')
@@ -32,6 +33,7 @@ def telegram():
     if json.get('message'):
         message = tg_api.get_nmessage(json['message'])
         app.logger.info('Telegram message: {}'.format(message.__repr__()))
+        process_nmessage(message)
 
     return 'Ok'
 
