@@ -2,8 +2,18 @@ import os
 from enum import Enum, unique
 
 from peewee import Model, IntegerField, PostgresqlDatabase, TextField
+from urllib3.util import parse_url
 
-database = PostgresqlDatabase(os.getenv('DATABASE_URL'))
+db_url = parse_url(os.getenv('DATABASE_URL'))
+
+username, password = db_url.auth.split(':')
+
+database = PostgresqlDatabase(
+    db_url.path[1:],
+    host=db_url.host,
+    user=username,
+    password=password
+)
 
 
 class BaseModel(Model):
