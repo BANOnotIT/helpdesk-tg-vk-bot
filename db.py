@@ -1,9 +1,9 @@
+import os
 from enum import Enum, unique
-from os import environ
 
 from peewee import Model, IntegerField, PostgresqlDatabase, TextField
 
-database = PostgresqlDatabase(environ['DATABASE'])
+database = PostgresqlDatabase(os.getenv('DATABASE'))
 
 
 class BaseModel(Model):
