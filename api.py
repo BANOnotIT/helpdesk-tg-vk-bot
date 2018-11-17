@@ -49,17 +49,17 @@ class TgMessage(NMessage):
 
     @staticmethod
     def get_kind(message):
-        if hasattr(message, 'text'):
+        if message.get('text'):
             if message['text'].startswith('/'):
                 return MessageTypeEnum.command
 
             else:
                 return MessageTypeEnum.text
 
-        elif hasattr(message, 'new_chat_member'):
+        elif message.get('new_chat_member'):
             return MessageTypeEnum.joined
 
-        elif hasattr(message, 'left_chat_member'):
+        elif message.get('left_chat_member'):
             return MessageTypeEnum.leaved
 
         else:

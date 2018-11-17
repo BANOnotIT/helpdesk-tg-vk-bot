@@ -29,7 +29,7 @@ def hello_world():
 def telegram():
     json = request.get_json()
     app.logger.info('Telegram updates: {}'.format(json.__repr__()))
-    if hasattr(json, 'message'):
+    if json.get('message'):
         message = tg_api.get_nmessage(json['message'])
         app.logger.info('Telegram message: {}'.format(message.__repr__()))
 
