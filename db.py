@@ -3,7 +3,7 @@ from enum import Enum, unique
 
 from peewee import Model, IntegerField, PostgresqlDatabase, TextField
 
-database = PostgresqlDatabase(os.getenv('DATABASE'))
+database = PostgresqlDatabase(os.getenv('DATABASE_URL'))
 
 
 class BaseModel(Model):
