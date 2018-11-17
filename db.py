@@ -32,7 +32,10 @@ class UserState(Enum):
 
     @classmethod
     def as_choices(cls):
-        return [reversed(item) for item in cls.__members__.items()]
+        return [(item[1].value, item[0]) for item in cls.__members__.items()]
+
+
+print(UserState.as_choices())
 
 
 class User(BaseModel):
