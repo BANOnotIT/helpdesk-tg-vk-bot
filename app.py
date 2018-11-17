@@ -28,7 +28,7 @@ def hello_world():
 @app.route('/telegram-handler', methods=['POST'])
 def telegram():
     json = request.get_json()
-    app.logger.info('Telegram updates: {}'.format(json.__repr__()))
+
     if json.get('message'):
         message = tg_api.get_nmessage(json['message'])
         app.logger.info('Telegram message: {}'.format(message.__repr__()))

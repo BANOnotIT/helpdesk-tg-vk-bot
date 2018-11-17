@@ -25,7 +25,7 @@ class NMessage:
         raise TypeError('Unimplemented method message in Api')
 
     def __repr__(self):
-        return '<Message {} from {}: {}>'.format(self.kind.name, self.user, self.text)
+        return '<Message {} from {}: {}>'.format(self.kind.name, self.user.__repr__(), self.text)
 
 
 class TgApi(Api):
