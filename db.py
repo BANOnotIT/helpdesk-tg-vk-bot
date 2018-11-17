@@ -1,7 +1,7 @@
 import os
 from enum import Enum, unique
 
-from peewee import Model, IntegerField, PostgresqlDatabase, TextField, CompositeKey
+from peewee import Model, IntegerField, PostgresqlDatabase, TextField
 from urllib3.util import parse_url
 
 db_url = parse_url(os.getenv('DATABASE_URL'))
@@ -43,7 +43,7 @@ class User(Model):
     class Meta:
         database = database
         table_name = 'app_users'
-        primary_key = CompositeKey('tg', 'vk')
+        primary_key = False
 
 
 def create_tables():
