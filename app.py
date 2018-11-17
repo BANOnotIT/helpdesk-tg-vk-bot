@@ -1,6 +1,6 @@
 from logging import debug
 
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
@@ -11,7 +11,7 @@ def hello_world():
 
 
 @app.route('/telegram-handler')
-def telegram(request):
+def telegram():
     debug('Telegram updates: {}'.format(request.get_json().__repr__()))
     return 'Ok'
 
