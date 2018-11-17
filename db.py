@@ -35,12 +35,9 @@ class UserState(Enum):
         return [(item[1].value, item[0]) for item in cls.__members__.items()]
 
 
-print(UserState.as_choices())
-
-
 class User(BaseModel):
-    tg_id = IntegerField(null=True, unique=True, help_text='Telegram User Id')
-    vk_id = IntegerField(null=True, unique=True, help_text='VK User Id')
+    tg_id = IntegerField(null=True, help_text='Telegram User Id')
+    vk_id = IntegerField(null=True, help_text='VK User Id')
     state = IntegerField(default=UserState.authorizing, choices=UserState.as_choices())
     additional_parameter = TextField()
 
