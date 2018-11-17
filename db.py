@@ -6,10 +6,11 @@ from urllib3.util import parse_url
 
 db_url = parse_url(os.getenv('DATABASE_URL'))
 
+# Берём из auth имя пользователя и пароль от БД
 username, password = db_url.auth.split(':')
 
 database = PostgresqlDatabase(
-    db_url.path[1:],
+    db_url.path[1:],  # Пропускаем первый "/", так как он не является названием БД
     host=db_url.host,
     user=username,
     password=password
