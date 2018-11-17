@@ -17,7 +17,7 @@ def hello_world():
     return 'Hello World!'
 
 
-@app.route('/telegram-handler')
+@app.route('/telegram-handler', methods=['POST'])
 def telegram():
     app.logger.info('Telegram updates: {}'.format(request.get_json().__repr__()))
     return 'Ok'
