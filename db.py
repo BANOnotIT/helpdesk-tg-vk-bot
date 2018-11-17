@@ -17,11 +17,6 @@ database = PostgresqlDatabase(
 )
 
 
-class BaseModel(Model):
-    class Meta:
-        database = database
-
-
 @unique
 class UserState(Enum):
     authorizing = 1
@@ -35,7 +30,7 @@ class UserState(Enum):
         return [(item[1].value, item[0]) for item in cls.__members__.items()]
 
 
-class User(BaseModel):
+class User(Model):
     tg_id = IntegerField(null=True, help_text='Telegram User Id')
     vk_id = IntegerField(null=True, help_text='VK User Id')
     state = IntegerField(default=UserState.authorizing.value, choices=UserState.as_choices())
@@ -44,6 +39,10 @@ class User(BaseModel):
     def __repr__(self):
         return '<User tg={} vk={} state={}:{}>'.format(self.tg_id, self.vk_id, self.state.name,
                                                        self.additional_parameter)
+
+    class Meta:
+        database = database
+        table_name = 'app_users'
 
 
 def create_tables():
