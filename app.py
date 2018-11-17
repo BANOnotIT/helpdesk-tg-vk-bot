@@ -3,8 +3,10 @@ import logging
 from flask import Flask, request
 
 import db
+from api import TgApi
 
 app = Flask(__name__)
+tg_api = TgApi('SomeToken')
 
 # Инициализируем все таблички в бд
 db.create_tables()
@@ -25,7 +27,12 @@ def hello_world():
 # Обрабатываем телеграмовы сообщения
 @app.route('/telegram-handler', methods=['POST'])
 def telegram():
-    app.logger.info('Telegram updates: {}'.format(request.get_json().__repr__()))
+    json = request.get_json()
+    app.logger.info('Telegram updates: {}'.format(json.__repr__()))
+    if hasattr(json, 'message'):
+        message = tg_api.get_nmessage(json['message'])
+        app.logger.info('Telegram message: {}'.format(message.__repr__()))
+
     return 'Ok'
 
 

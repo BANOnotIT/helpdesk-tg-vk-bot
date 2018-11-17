@@ -41,6 +41,10 @@ class User(BaseModel):
     state = IntegerField(default=UserState.authorizing, choices=UserState.as_choices())
     additional_parameter = TextField()
 
+    def __repr__(self):
+        return '<User tg={} vk={} state={}:{}>'.format(self.tg_id, self.vk_id, self.state.name,
+                                                       self.additional_parameter)
+
 
 def create_tables():
     with database:
