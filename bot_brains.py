@@ -108,6 +108,7 @@ def process_nmessage(message: NMessage):
                 n_user.delete_instance()
 
                 # Ну и теперь уже сохраняем текущего пользователя
+                user.set_state(UserState.base)
                 user.save(force_insert=True)
 
                 # Теперь говорим пользователю что же изменилось
