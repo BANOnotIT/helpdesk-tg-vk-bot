@@ -60,7 +60,7 @@ def vkontakte():
 
     app.logger.info(repr(json))
 
-    if json['type'] == 'conformation':
+    if json['type'] == 'confirmation':
         return '486aef95'
 
     message = vk_api.get_nmessage(json)
