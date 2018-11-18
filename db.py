@@ -38,6 +38,10 @@ class User(Model):
                          help_text='Current bot state for user')
     state_param = TextField(default='', help_text='Param for state')
 
+    def set_state(self, state: UserState, param=''):
+        self.state = state.value
+        self.state_param = param
+
     def __repr__(self):
         return '<User tg={} vk={} state={}:{}>'.format(self.tg, self.vk, UserState(self.state).name,
                                                        self.state_param)
