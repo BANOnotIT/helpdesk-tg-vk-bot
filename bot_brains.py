@@ -15,7 +15,7 @@ def process_nmessage(message: NMessage):
         user.state_param = ''
         user.save()
 
-        message.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.\n{}'.format(repr(user)))
+        message.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.')
 
     elif state is UserState.authorizing:
         # Проверяем, есть ли переход в другое состояние машины
