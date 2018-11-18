@@ -1,5 +1,6 @@
 from logging import debug
 
+from flask import current_app
 from requests import post
 
 from db import User
@@ -17,12 +18,8 @@ class TgApi(Api):
     def get_nmessage(self, message):
         user, new = User.get_or_create(tg=int(message['from']['id']))
 
-        print('New UsEr') if new else None
-
-        # if not user:
-        #     user = User.create()
-        #     user.tg = int(message['from']['id'])
-        #     user.save()
+        if new:
+            current_app.logger.info('Created new tg user: {}'.format(repr(user)))
 
         chat = int(message['chat']['id'])
 
