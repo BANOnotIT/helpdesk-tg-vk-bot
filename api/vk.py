@@ -2,7 +2,7 @@ from flask import current_app
 from requests import post
 
 from db import User
-from .base import Api, MessageType, NMessage
+from .base import Api, MessageType, NMessage, Platform
 
 
 class VkApi(Api):
@@ -55,6 +55,8 @@ class VkApi(Api):
 
 
 class VkMessage(NMessage):
+    platform = Platform.vk
+
     def __init__(self, text, user, api, kind, chat):
         self.api = api
         self.text = text
