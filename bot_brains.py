@@ -1,6 +1,6 @@
 from flask import current_app
 
-from api import NMessage, MessageTypeEnum as MsgType
+from api import NMessage, MessageType as MsgType
 from db import UserState
 
 

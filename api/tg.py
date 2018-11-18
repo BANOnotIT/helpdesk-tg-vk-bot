@@ -4,7 +4,7 @@ from flask import current_app
 from requests import post
 
 from db import User
-from .base import Api, NMessage, MessageTypeEnum
+from .base import Api, NMessage, MessageType
 
 
 class TgApi(Api):
@@ -49,19 +49,19 @@ class TgMessage(NMessage):
     def get_kind(message):
         if message.get('text'):
             if message['text'].startswith('/'):
-                return MessageTypeEnum.command
+                return MessageType.command
 
             else:
-                return MessageTypeEnum.text
+                return MessageType.text
 
         elif message.get('new_chat_member'):
-            return MessageTypeEnum.joined
+            return MessageType.joined
 
         elif message.get('left_chat_member'):
-            return MessageTypeEnum.leaved
+            return MessageType.leaved
 
         else:
-            return MessageTypeEnum.unknown
+            return MessageType.unknown
 
     def reply(self, message: str):
         return self.api.message(self.chat, message)

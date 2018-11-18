@@ -9,7 +9,7 @@ class Api:
         raise TypeError('Unimplemented method `message` in Api')
 
 
-class MessageTypeEnum(Enum):
+class MessageType(Enum):
     unknown = 0
     text = 1
     command = 2
@@ -19,7 +19,7 @@ class MessageTypeEnum(Enum):
 
 class NMessage:
     text = ''
-    kind = MessageTypeEnum.unknown
+    kind = MessageType.unknown
     user = None  # User
     chat = None
 
