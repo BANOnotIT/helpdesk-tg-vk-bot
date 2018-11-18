@@ -39,7 +39,7 @@ class User(Model):
 
     def __repr__(self):
         return '<User tg={} vk={} state={}:{}>'.format(self.tg, self.vk, UserState(self.state).name,
-                                                       self.additional_parameter)
+                                                       self.state_param)
 
     class Meta:
         database = database
