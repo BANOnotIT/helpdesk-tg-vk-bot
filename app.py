@@ -13,6 +13,18 @@ tg_api = TgApi(getenv('TG_TOKEN'))
 # Инициализируем все таблички в бд
 db.create_tables()
 
+
+@app.before_request
+def before_request():
+    db.database.connect()
+
+
+@app.after_request
+def after_request(response):
+    db.database.close()
+    return response
+
+
 # Логируем все что у нас есть в gunicorn, чтобы было видно в консоли
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')

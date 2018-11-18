@@ -16,6 +16,9 @@ class TgApi(Api):
 
     def get_nmessage(self, message):
         user, new = User.get_or_create(tg=int(message['from']['id']))
+
+        print('New UsEr') if new else None
+
         # if not user:
         #     user = User.create()
         #     user.tg = int(message['from']['id'])
