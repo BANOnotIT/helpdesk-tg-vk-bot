@@ -38,7 +38,7 @@ class User(Model):
     state_param = TextField(default='')
 
     def __repr__(self):
-        return '<User tg={} vk={} state={}:{}>'.format(self.tg, self.vk, self.state.name,
+        return '<User tg={} vk={} state={}:{}>'.format(self.tg, self.vk, UserState(self.state).name,
                                                        self.additional_parameter)
 
     class Meta:
