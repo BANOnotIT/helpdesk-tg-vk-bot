@@ -29,7 +29,6 @@ def after_request(response):
 # Логируем все что у нас есть в gunicorn, чтобы было видно в консоли
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
-    logging.root.handlers = gunicorn_logger.handlers
     app.logger.handlers = gunicorn_logger.handlers
     # Учитываем уровень логов самого gunicorn
     app.logger.setLevel(gunicorn_logger.level)
@@ -61,7 +60,7 @@ def vkontakte():
     app.logger.info(repr(json))
 
     if json['type'] == 'confirmation':
-        return '486aef95'
+        return getenv('VK_VERIFY_SALT')
 
     message = vk_api.get_nmessage(json)
     app.logger.info('Vkontakte message: {}'.format(message.__repr__()))
