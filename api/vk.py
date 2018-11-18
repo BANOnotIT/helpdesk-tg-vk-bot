@@ -19,13 +19,17 @@ class VkApi(Api):
         kind = MessageType.unknown
         text = ''
 
-        if message['type'] == 'group_join':
+        # Если появился новый пользователь или начался новый диалог
+        if message['type'] in ('group_join', 'message_allow'):
             vk_id = message['object']['user_id']
             kind = MessageType.joined
 
+        # Если мы узнали, что пользователь покинул нас...
         elif message['type'] == 'group_leave':
             vk_id = message['object']['user_id']
             kind = MessageType.leaved
+
+        # Если пользователь прислал нам сообщение
         elif message['type'] in ('message_new', 'message_edit'):
             vk_id = message['object']['from_id']
             text = message['object']['text']
