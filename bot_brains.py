@@ -98,23 +98,17 @@ def process_nmessage(message: NMessage):
                     message.reply('I don\'n know what you\'re talking about.')
                     return
 
-                result_user = User()
                 # Производим слияние двух аккаунтов в один (суммируем деньги, переводим друзей, etc.)
                 if is_from_vk:
-                    result_user.tg = n_user.tg
-                    result_user.vk = user.vk
-
+                    user.tg = n_user.tg
                 else:
-                    result_user.tg = user.tg
-                    result_user.vk = n_user.vk
+                    user.vk = n_user.vk
 
                 # Теперь нам прошлый аккаунт не нужен, чтобы не создавать дублей в бд
                 n_user.delete_instance()
-                user.delete_instance()
 
                 # Ну и теперь уже сохраняем текущего пользователя
-                result_user.set_state(UserState.base)
-                result_user.save()
+                user.save(force_insert=True)
 
                 # Теперь говорим пользователю что же изменилось
                 message.reply('Alright. Now I can talk to you in various kinds!')
