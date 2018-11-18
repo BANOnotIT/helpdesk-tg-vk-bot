@@ -53,7 +53,7 @@ def process_nmessage(message: NMessage):
 
                 message.reply('''
                 Go to {}.
-                When I'll have no doubt you are a good person to work with say `/in {}`. 
+                When I would have no doubt you are a good person to work with say `/in {}`. 
                 Then I would be sure you have both channels to contact me, ok?
                 '''.format(link, phrase))
 
