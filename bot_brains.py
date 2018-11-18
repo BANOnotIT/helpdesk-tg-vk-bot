@@ -1,3 +1,5 @@
+from flask import current_app
+
 from api import NMessage, MessageTypeEnum as MsgType
 from db import UserState
 
@@ -25,6 +27,8 @@ def process_nmessage(message: NMessage):
 
             # Отвечаем пользователю
             message.reply('You\'re goddamn right! Now let\'s work!')
+
+            current_app.logger.info('Authorization succeeded: {}'.format(repr(user)))
 
         else:
             # Переход не случился
