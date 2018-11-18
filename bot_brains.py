@@ -75,19 +75,8 @@ def process_nmessage(message: NMessage):
                 # Пропускаем первые 4 символа, обозначающие команду ("/in "), и берём остальное сообщение
                 phrase = message.text[4:].strip()
 
-                # Нужно чётко знать, какого пользователя мы ищем, чтобы не удалить случайно другого.
-                # Наш не занимается ничем иным кроме ожидания интеграции
-                user_integrating_vk = (User.tg != 0) & \
-                                      (User.vk == 0) & \
-                                      (User.state == UserState.integrating_vk.value)
-
-                user_integrating_tg = (User.vk != 0) & \
-                                      (User.tg == 0) & \
-                                      (User.state == UserState.integrating_tg.value)
-
                 # Берём нашего пользователя
                 n_user = User.get_or_none(
-                    # user_integrating_tg if is_from_vk else user_integrating_vk,
                     User.state_param == phrase
                 )
 
@@ -109,7 +98,7 @@ def process_nmessage(message: NMessage):
 
                 # Ну и теперь уже сохраняем текущего пользователя
                 user.set_state(UserState.base)
-                user.save(force_insert=True)
+                user.save(force_insert=True)  # обязательно указываем force_insert, потому что мы поменяли ключевые поля
 
                 # Теперь говорим пользователю что же изменилось
                 message.reply('Alright. Now I can talk to you in various kinds!')
@@ -121,6 +110,9 @@ def process_nmessage(message: NMessage):
                         'tg' if is_from_vk else 'vk'
                     )
                 )
+
+        else:
+            message.reply('What do you want from me?')
 
     # Если пользователь ожидает интеграции, то он может только отменить
     elif state in (UserState.integrating_vk, UserState.integrating_tg):
