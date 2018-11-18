@@ -16,6 +16,7 @@ db.create_tables()
 # Логируем все что у нас есть в gunicorn, чтобы было видно в консоли
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
+    logging.root.handlers = gunicorn_logger.handlers
     app.logger.handlers = gunicorn_logger.handlers
     # Учитываем уровень логов самого gunicorn
     app.logger.setLevel(gunicorn_logger.level)

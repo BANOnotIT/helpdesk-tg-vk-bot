@@ -1,3 +1,5 @@
+from logging import debug
+
 from api import NMessage, MessageTypeEnum as MsgType
 from db import UserState
 
@@ -13,7 +15,11 @@ def process_nmessage(message: NMessage):
         user.state_param = ''
         user.save()
 
-        message.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.')
+        debug('Sending auth message')
+
+        resp = message.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.')
+
+        debug(repr(resp))
 
     elif state is UserState.authorizing:
         # Проверяем, есть ли переход в другое состояние машины

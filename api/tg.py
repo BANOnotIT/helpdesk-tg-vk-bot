@@ -1,3 +1,5 @@
+from logging import debug
+
 from requests import post
 
 from db import User
@@ -28,6 +30,7 @@ class TgApi(Api):
         return post(self.url + method, data).json()
 
     def message(self, chat: int, message: str):
+        debug('Sending tg message to {}: {}'.format(chat, message))
         return self.exec('sendMessage', {
             'chat_id': chat,
             'text': message,
