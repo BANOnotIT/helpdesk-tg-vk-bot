@@ -1,38 +1,16 @@
-from enum import Enum
+from requests import post
 
 from db import User
-
-
-class Api:
-    def get_nmessage(self, message):
-        raise TypeError('Unimplemented method message in Api')
-
-
-class MessageTypeEnum(Enum):
-    unknown = 0
-    text = 1
-    command = 2
-    joined = 3
-    leaved = 4
-
-
-class NMessage:
-    text = ''
-    kind = MessageTypeEnum.unknown
-    user = None  # User
-
-    def reply(self, message: str):
-        raise TypeError('Unimplemented method message in Api')
-
-    def __repr__(self):
-        return '<Message {} from {}: {}>'.format(self.kind.name, self.user.__repr__(), self.text)
+from .base import Api, NMessage, MessageTypeEnum
 
 
 class TgApi(Api):
     token = ''
+    url = 'https://api.telegram.org/bot{}/'
 
     def __init__(self, token):
         self.token = token
+        self.url = self.url.format(token)
 
     def get_nmessage(self, message):
         user = User.get_or_none(tg=int(message['from']['id']))
@@ -41,16 +19,28 @@ class TgApi(Api):
             user.tg = int(message['from']['id'])
             user.save()
 
+        chat = int(message['chat']['id'])
+
         kind = TgMessage.get_kind(message)
-        return TgMessage(message.get('text', ''), user, self, kind)
+        return TgMessage(message.get('text', ''), user, self, kind, chat)
+
+    def exec(self, method: str, data: dict):
+        return post(self.url + method, data).json()
+
+    def message(self, chat: int, message: str):
+        return self.exec('sendMessage', {
+            'chat_id': chat,
+            'text': message,
+        })
 
 
 class TgMessage(NMessage):
-    def __init__(self, text, user, api, kind):
+    def __init__(self, text, user, api, kind, chat):
         self.api = api
         self.text = text
         self.user = user
         self.kind = kind
+        self.chat = chat
 
     @staticmethod
     def get_kind(message):
@@ -69,3 +59,6 @@ class TgMessage(NMessage):
 
         else:
             return MessageTypeEnum.unknown
+
+    def reply(self, message: str):
+        return self.api.message(self.chat, message)

@@ -1,4 +1,5 @@
 import logging
+from os import getenv
 
 from flask import Flask, request
 
@@ -7,7 +8,7 @@ from api import TgApi
 from bot_brains import process_nmessage
 
 app = Flask(__name__)
-tg_api = TgApi('SomeToken')
+tg_api = TgApi(getenv('TG_TOKEN'))
 
 # Инициализируем все таблички в бд
 db.create_tables()
