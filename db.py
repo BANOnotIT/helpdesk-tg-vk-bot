@@ -55,3 +55,5 @@ class User(Model):
 def create_tables():
     with database:
         database.create_tables([User])
+    # закрываем подключение, чтобы не могли слушать ничего страшного.
+    database.close()

@@ -108,7 +108,7 @@ def process_nmessage(message: NMessage):
                 n_user.delete_instance()
 
                 # Ну и теперь уже сохраняем текущего пользователя
-                user.save()
+                user.save(force_insert=True)
 
                 # Теперь говорим пользователю что же изменилось
                 message.reply('Alright. Now I can talk to you in various kinds!')
