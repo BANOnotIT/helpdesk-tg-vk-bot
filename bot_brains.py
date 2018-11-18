@@ -63,7 +63,10 @@ def process_nmessage(message: NMessage):
 
                 # Передаём пользователю инструкцию по интегрированию нового сервиса
                 message.reply(('Go to {}.\n'
-                               'When I\'ll have no doubt you are a good person to work with say `/in {}`.\n'
+                               'When I\'ll have no doubt you are a good person to work with say\n'
+                               '\n'
+                               '`/in {}`.\n'
+                               '\n'
                                'Then I would be sure you have both channels to contact me, ok?').format(link, phrase))
 
             # Обработка привязки одного аккаунта с другим
