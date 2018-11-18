@@ -7,7 +7,7 @@ from .base import Api, MessageType, NMessage
 
 class VkApi(Api):
     token = ''
-    url = 'https://api.telegram.org/bot{}/'
+    url = 'https://api.vk.com/method/'
 
     def __init__(self, token):
         self.token = token
@@ -39,14 +39,19 @@ class VkApi(Api):
         return VkMessage(text, user, self, kind, vk_id)
 
     def exec(self, method: str, data: dict):
-        return post(self.url + method, data).json()
+        settings = {
+            'access_token': self.token,
+            'v': '5.87'
+        }
+
+        return post(self.url + method, {**data, **settings}).json()
 
     def message(self, chat: int, message: str):
         current_app.logger.debug('Sending vk message to {}: {}'.format(chat, message))
-        # return self.exec('sendMessage', {
-        #     'chat_id': chat,
-        #     'text': message,
-        # })
+        return self.exec('messages.send', {
+            'user_id': chat,
+            'message': message,
+        })
 
 
 class VkMessage(NMessage):
