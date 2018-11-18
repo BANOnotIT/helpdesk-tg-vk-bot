@@ -15,7 +15,7 @@ class TgApi(Api):
         self.url = self.url.format(token)
 
     def get_nmessage(self, message):
-        user = User.get_or_create(tg=int(message['from']['id']))
+        user, new = User.get_or_create(tg=int(message['from']['id']))
         # if not user:
         #     user = User.create()
         #     user.tg = int(message['from']['id'])
