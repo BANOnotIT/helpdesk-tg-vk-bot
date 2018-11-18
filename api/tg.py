@@ -4,7 +4,7 @@ from flask import current_app
 from requests import post
 
 from db import User
-from .base import Api, NMessage, MessageType
+from .base import Api, NMessage, MessageType, Platform
 
 
 class TgApi(Api):
@@ -38,6 +38,8 @@ class TgApi(Api):
 
 
 class TgMessage(NMessage):
+    platform = Platform.tg
+
     def __init__(self, text, user, api, kind, chat):
         self.api = api
         self.text = text

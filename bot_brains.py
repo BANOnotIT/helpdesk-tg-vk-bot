@@ -62,11 +62,9 @@ def process_nmessage(message: NMessage):
                 user.save()
 
                 # Передаём пользователю инструкцию по интегрированию нового сервиса
-                message.reply('''
-                Go to {}.
-                When I'll have no doubt you are a good person to work with say `/in {}`. 
-                Then I would be sure you have both channels to contact me, ok?
-                '''.format(link, phrase))
+                message.reply(('Go to {}.'
+                               'When I\'ll have no doubt you are a good person to work with say `/in {}`.'
+                               'Then I would be sure you have both channels to contact me, ok?').format(link, phrase))
 
             # Обработка привязки одного аккаунта с другим
             elif message.text.startswith('/in'):
