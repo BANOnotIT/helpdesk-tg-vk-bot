@@ -17,11 +17,18 @@ class MessageType(Enum):
     leaved = 4
 
 
+class Platform(Enum):
+    unknown = 0
+    tg = 1
+    vk = 2
+
+
 class NMessage:
     text = ''
     kind = MessageType.unknown
     user = None  # User
     chat = None
+    platform = Platform.unknown
 
     def reply(self, message: str):
         raise TypeError('Unimplemented method `message` in NMessage')
