@@ -62,15 +62,15 @@ def process_nmessage(message: NMessage):
                 user.save()
 
                 # Передаём пользователю инструкцию по интегрированию нового сервиса
-                message.reply(('Go to {}.'
-                               'When I\'ll have no doubt you are a good person to work with say `/in {}`.'
+                message.reply(('Go to {}.\n'
+                               'When I\'ll have no doubt you are a good person to work with say `/in {}`.\n'
                                'Then I would be sure you have both channels to contact me, ok?').format(link, phrase))
 
             # Обработка привязки одного аккаунта с другим
             elif message.text.startswith('/in'):
 
                 # Пропускаем первые 4 символа, обозначающие команду ("/in "), и берём остальное сообщение
-                phrase = message.text[3:]
+                phrase = message.text[4:].strip()
 
                 # Нужно чётко знать, какого пользователя мы ищем, чтобы не удалить случайно другого.
                 # Наш не занимается ничем иным кроме ожидания интеграции
@@ -84,8 +84,8 @@ def process_nmessage(message: NMessage):
 
                 # Берём нашего пользователя
                 n_user = User.get_or_none(
-                    # user_integrating_tg if is_from_vk else user_integrating_vk,
-                    state_param=phrase
+                    user_integrating_tg if is_from_vk else user_integrating_vk,
+                    User.state_param == phrase
                 )
 
                 # Скорее всего такого пользователя нет, ну или фраза неправильная
