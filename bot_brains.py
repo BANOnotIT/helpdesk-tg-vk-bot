@@ -1,5 +1,3 @@
-from logging import info
-
 from api import NMessage, MessageTypeEnum as MsgType
 from db import UserState
 
@@ -8,9 +6,6 @@ def process_nmessage(message: NMessage):
     user = message.user
     state = UserState(user.state)
 
-    info('Processing user {}', user.__repr__())
-    info('User state is authorizing {}', UserState.initial is state)
-
     cancel = message.kind is MsgType.command and message.text == '/cancel'
 
     if state is UserState.initial:
@@ -18,11 +13,7 @@ def process_nmessage(message: NMessage):
         user.state_param = ''
         user.save()
 
-        info('Sending auth message')
-
-        resp = message.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.')
-
-        info(repr(resp))
+        message.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.\n{}'.format(repr(user)))
 
     elif state is UserState.authorizing:
         # Проверяем, есть ли переход в другое состояние машины
