@@ -55,7 +55,7 @@ def telegram():
 
 # Обрабатываем телеграмовы сообщения
 @app.route('/vkontakte-handler', methods=['POST'])
-def telegram():
+def vkontakte():
     json = request.get_json()
 
     if json.get('type') == 'conformation':
