@@ -32,10 +32,11 @@ class UserState(Enum):
 
 
 class User(Model):
-    tg = IntegerField(null=True, help_text='Telegram User Id')
-    vk = IntegerField(null=True, help_text='VK User Id')
-    state = IntegerField(default=UserState.initial.value, choices=UserState.as_choices())
-    state_param = TextField(default='')
+    tg = IntegerField(default=0, help_text='Telegram User Id')
+    vk = IntegerField(default=0, help_text='VK User Id')
+    state = IntegerField(default=UserState.initial.value, choices=UserState.as_choices(),
+                         help_text='Current bot state for user')
+    state_param = TextField(default='', help_text='Param for state')
 
     def __repr__(self):
         return '<User tg={} vk={} state={}:{}>'.format(self.tg, self.vk, UserState(self.state).name,
