@@ -4,11 +4,12 @@ from os import getenv
 from flask import Flask, request
 
 import db
-from api import TgApi
+from api import TgApi, VkApi
 from bot_brains import process_nmessage
 
 app = Flask(__name__)
 tg_api = TgApi(getenv('TG_TOKEN'))
+vk_api = VkApi(getenv('VK_TOKEN'))
 
 # Инициализируем все таблички в бд
 db.create_tables()
@@ -48,6 +49,21 @@ def telegram():
         message = tg_api.get_nmessage(json['message'])
         app.logger.info('Telegram message: {}'.format(message.__repr__()))
         process_nmessage(message)
+
+    return 'Ok'
+
+
+# Обрабатываем телеграмовы сообщения
+@app.route('/vkontakte-handler', methods=['POST'])
+def telegram():
+    json = request.get_json()
+
+    if json.get('type') == 'conformation':
+        return '486aef95'
+
+    message = vk_api.get_nmessage(json)
+    app.logger.info('Vkontakte message: {}'.format(message.__repr__()))
+    process_nmessage(message)
 
     return 'Ok'
 
