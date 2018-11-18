@@ -87,7 +87,7 @@ def process_nmessage(message: NMessage):
 
                 # Берём нашего пользователя
                 n_user = User.get_or_none(
-                    user_integrating_tg if is_from_vk else user_integrating_vk,
+                    # user_integrating_tg if is_from_vk else user_integrating_vk,
                     User.state_param == phrase
                 )
 
