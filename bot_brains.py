@@ -91,6 +91,8 @@ def process_nmessage(message: NMessage):
                     User.state_param == phrase
                 )
 
+                current_app.logger.info('Trying phrase "{}"'.format(phrase))
+
                 # Скорее всего такого пользователя нет, ну или фраза неправильная
                 if n_user is None:
                     message.reply('I don\'n know what you\'re talking about.')
@@ -108,6 +110,9 @@ def process_nmessage(message: NMessage):
                 # Ну и теперь уже сохраняем текущего пользователя
                 user.save()
 
+                # Теперь говорим пользователю что же изменилось
+                message.reply('Alright. Now I can talk to you in various kinds!')
+
                 # Обязательно говорим, что кто-то совершил интеграцию
                 current_app.logger.info(
                     '{} integrated {}'.format(
@@ -115,3 +120,17 @@ def process_nmessage(message: NMessage):
                         'tg' if is_from_vk else 'vk'
                     )
                 )
+
+    # Если пользователь ожидает интеграции, то он может только отменить
+    elif state in (UserState.integrating_vk, UserState.integrating_tg):
+
+        if cancel:
+            # Переводим нашего пользователя в статус авторизации
+            user.set_state(UserState.base)
+            user.save()
+
+            # Приветствуем пользователя и сразу говорим, что он должен пройти обряд инициализации
+            message.reply('Ok. I\'ll say to my boys that it\'s unnecessary')
+        else:
+            # Даём пользователю инструкцию и пояснения текущего статуса
+            message.reply('I\'m waiting for you in other info channel. You only can /cancel it')
