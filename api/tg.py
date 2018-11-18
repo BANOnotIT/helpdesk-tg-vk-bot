@@ -1,5 +1,3 @@
-from logging import debug
-
 from flask import current_app
 from requests import post
 
@@ -30,7 +28,7 @@ class TgApi(Api):
         return post(self.url + method, data).json()
 
     def message(self, chat: int, message: str):
-        debug('Sending tg message to {}: {}'.format(chat, message))
+        current_app.logger.debug('Sending tg message to {}: {}'.format(chat, message))
         return self.exec('sendMessage', {
             'chat_id': chat,
             'text': message,
