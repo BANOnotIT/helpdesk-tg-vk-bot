@@ -58,7 +58,9 @@ def telegram():
 def vkontakte():
     json = request.get_json()
 
-    if json.get('type') == 'conformation':
+    app.logger.info(repr(json))
+
+    if json['type'] == 'conformation':
         return '486aef95'
 
     message = vk_api.get_nmessage(json)
