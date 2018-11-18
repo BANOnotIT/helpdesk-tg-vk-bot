@@ -19,6 +19,7 @@ database = PostgresqlDatabase(
 
 @unique
 class UserState(Enum):
+    initial = 0
     authorizing = 1
     base = 2
     integrating_tg = 3
@@ -33,7 +34,7 @@ class UserState(Enum):
 class User(Model):
     tg = IntegerField(null=True, help_text='Telegram User Id')
     vk = IntegerField(null=True, help_text='VK User Id')
-    state = IntegerField(default=UserState.authorizing.value, choices=UserState.as_choices())
+    state = IntegerField(default=UserState.initial.value, choices=UserState.as_choices())
     state_param = TextField(default='')
 
     def __repr__(self):
