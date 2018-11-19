@@ -2,7 +2,7 @@ from flask import current_app
 from requests import post
 
 from db import User
-from .base import Api, MessageType, NMessage, Platform
+from .base import Api, MessageType, Message, Platform
 
 
 class VkApi(Api):
@@ -40,7 +40,7 @@ class VkApi(Api):
         if new:
             current_app.logger.info('Created new vk user: {}'.format(repr(user)))
 
-        return VkMessage(text, user, self, kind, vk_id)
+        return VkMessage(text, user, kind, vk_id, api=self)
 
     def exec(self, method: str, data: dict):
         settings = {
@@ -58,15 +58,12 @@ class VkApi(Api):
         })
 
 
-class VkMessage(NMessage):
+class VkMessage(Message):
     platform = Platform.vk
 
-    def __init__(self, text, user, api, kind, chat):
+    def __init__(self, *args, api):
+        super().__init__(self, *args)
         self.api = api
-        self.text = text
-        self.user = user
-        self.kind = kind
-        self.chat = chat
 
     def reply(self, message: str):
         return self.api.message(self.chat, message)

@@ -1,6 +1,6 @@
 from flask import current_app
 
-from api import NMessage, MessageType as MsgType, Platform
+from api import Message, MessageType as MsgType, Platform
 from config import *
 from db import UserState, User
 from state_machine import State, Machine
@@ -13,17 +13,17 @@ class InitialState(State):
 
 
 class AuthorizingState(State):
-    def transition_rule(self, msg: NMessage):
+    def transition_rule(self, msg: Message):
         if 'heizenberg' in msg.text.lower() or msg.kind is MsgType.command and msg.text == '/cancel':
             return BaseState()
 
         return None
 
-    def leave(self, msg: NMessage):
+    def leave(self, msg: Message):
         # Отвечаем пользователю
         msg.reply('You\'re goddamn right! Now let\'s work!')
 
-    def enter(self, msg: NMessage):
+    def enter(self, msg: Message):
         # Переводим нашего пользователя в статус авторизации
         msg.user.set_state(UserState.authorizing)
         msg.user.save()
@@ -31,13 +31,13 @@ class AuthorizingState(State):
         # Приветствуем пользователя и сразу говорим, что он должен пройти обряд инициализации
         msg.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.')
 
-    def stay(self, msg: NMessage):
+    def stay(self, msg: Message):
         # Переход не случился
         msg.reply('You know how exactly I am. Now say my name.')
 
 
 class BaseState(State):
-    def transition_rule(self, msg: NMessage):
+    def transition_rule(self, msg: Message):
         command = msg.kind is MsgType.command
 
         if command and msg.text == '/bind':
@@ -45,19 +45,19 @@ class BaseState(State):
 
         return None
 
-    def enter(self, msg: NMessage):
+    def enter(self, msg: Message):
         user = msg.user
         user.set_state(UserState.base)
         user.save()
 
-    def stay(self, msg: NMessage):
+    def stay(self, msg: Message):
         if msg.kind is MsgType.command and msg.text.startswith('/in '):
             self.in_command_handler(msg)
             return
 
         msg.reply('What do you want from me?')
 
-    def in_command_handler(self, msg: NMessage):
+    def in_command_handler(self, msg: Message):
         is_from_vk = msg.platform is Platform.vk
         # Пропускаем первые 4 символа, обозначающие команду ("/in "), и берём остальное сообщение
         phrase = msg.text[4:].strip()
@@ -103,17 +103,17 @@ binding_msg = (
 
 
 class BindVKState(State):
-    def transition_rule(self, msg: NMessage):
+    def transition_rule(self, msg: Message):
         if MsgType.command and msg.text == '/cancel':
             return BaseState()
 
         return None
 
-    def leave(self, msg: NMessage):
+    def leave(self, msg: Message):
         # Отвечаем пользователю
         msg.reply('Ok. I\'ll say to my boys that it\'s unnecessary')
 
-    def enter(self, msg: NMessage):
+    def enter(self, msg: Message):
         # Выбираем случайные 4 слова откуда-либо, главное случайные
         phrase = get_random_phrase().lower()
 
@@ -124,14 +124,14 @@ class BindVKState(State):
         # Передаём пользователю инструкцию по интегрированию нового сервиса
         msg.reply(binding_msg.format(vk_link, phrase))
 
-    def stay(self, msg: NMessage):
+    def stay(self, msg: Message):
         # Переход не случился
         msg.reply('I\'m waiting for you in other info channel. You only can /cancel it.')
 
 
 class BindTGState(BindVKState):
     # В чём же прелесть ООП? В том, что не нужно копировать один и тот же код 1000 раз.
-    def enter(self, msg: NMessage):
+    def enter(self, msg: Message):
         # Выбираем случайные 4 слова откуда-либо, главное случайные
         phrase = get_random_phrase().lower()
 
@@ -163,5 +163,5 @@ class BotStateMachine(Machine):
 machine = BotStateMachine()
 
 
-def process_nmessage(message: NMessage):
+def process_nmessage(message: Message):
     machine.run(message)

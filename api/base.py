@@ -23,12 +23,18 @@ class Platform(Enum):
     vk = 2
 
 
-class NMessage:
+class Message:
     text = ''
     kind = MessageType.unknown
     user = None  # User
     chat = None
     platform = Platform.unknown
+
+    def __init__(self, text, user, kind, chat):
+        self.text = text
+        self.user = user
+        self.kind = kind
+        self.chat = chat
 
     def reply(self, message: str):
         raise TypeError('Unimplemented method `message` in NMessage')
