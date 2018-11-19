@@ -58,14 +58,17 @@ def process_nmessage(message: NMessage):
                 phrase = get_random_phrase().lower()
 
                 # Меняем состояние машины и передаём дополнительный аргумент к состоянию
-                user.set_state(UserState.integrating_vk, phrase)
+                user.set_state(
+                    UserState.integrating_tg if is_from_vk else UserState.integrating_vk,
+                    phrase
+                )
                 user.save()
 
                 # Передаём пользователю инструкцию по интегрированию нового сервиса
                 message.reply(('Go to {}.\n'
                                'When I\'ll have no doubt you are a good person to work with say\n'
                                '\n'
-                               '`/in {}`.\n'
+                               '/in {}\n'
                                '\n'
                                'Then I would be sure you have both channels to contact me, ok?').format(link, phrase))
 
@@ -76,9 +79,7 @@ def process_nmessage(message: NMessage):
                 phrase = message.text[4:].strip()
 
                 # Берём нашего пользователя
-                n_user = User.get_or_none(
-                    User.state_param == phrase
-                )
+                n_user = User.get_or_none(User.state_param == phrase)
 
                 current_app.logger.info('Trying phrase "{}"'.format(phrase))
 
