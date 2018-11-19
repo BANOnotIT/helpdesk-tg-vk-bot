@@ -3,125 +3,165 @@ from flask import current_app
 from api import NMessage, MessageType as MsgType, Platform
 from config import *
 from db import UserState, User
+from state_machine import State, Machine
 from utils import get_random_phrase
 
 
-def process_nmessage(message: NMessage):
-    # Переменные для удобства
-    user = message.user
-    state = UserState(user.state)
-    is_from_vk = message.platform is Platform.vk
+class InitialState(State):
+    def transition_rule(self, msg):
+        return AuthorizingState()
 
-    # Пользователь пожелал отменить текущее действие
-    cancel = message.kind is MsgType.command and message.text == '/cancel'
 
-    # Пользователь пришёл в первый раз и вообще это его первое сообщение
-    if state is UserState.initial:
+class AuthorizingState(State):
+    def transition_rule(self, msg: NMessage):
+        if 'heizenberg' in msg.text.lower() or msg.kind is MsgType.command and msg.text == '/cancel':
+            return BaseState()
+
+        return None
+
+    def leave(self, msg: NMessage):
+        # Отвечаем пользователю
+        msg.reply('You\'re goddamn right! Now let\'s work!')
+
+    def enter(self, msg: NMessage):
         # Переводим нашего пользователя в статус авторизации
-        user.set_state(UserState.authorizing)
-        user.save()
+        msg.user.set_state(UserState.authorizing)
+        msg.user.save()
 
         # Приветствуем пользователя и сразу говорим, что он должен пройти обряд инициализации
-        message.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.')
+        msg.reply('I\'m the cook. I\'m the man who killed Gus Fring. Say my name.')
 
-    elif state is UserState.authorizing:
-        # Проверяем, есть ли переход в другое состояние машины
-        if 'heizenberg' in message.text.lower() or cancel:
-            # Меняем состояние "машины" для этого конкретного пользователя
-            user.set_state(UserState.base)
-            user.save()
+    def stay(self, msg: NMessage):
+        # Переход не случился
+        msg.reply('You know how exactly I am. Now say my name.')
 
-            # Отвечаем пользователю
-            message.reply('You\'re goddamn right! Now let\'s work!')
 
-            # Логируем, что в нашем полку прибыло
-            current_app.logger.info('Authorization succeeded: {}'.format(repr(user)))
+class BaseState(State):
+    def transition_rule(self, msg: NMessage):
+        command = msg.kind is MsgType.command
 
+        if command and msg.text == '/bind':
+            return BindTGState() if msg.platform is Platform.vk else BindVKState()
+
+        return None
+
+    def enter(self, msg: NMessage):
+        user = msg.user
+        user.set_state(UserState.base)
+        user.save()
+
+    def stay(self, msg: NMessage):
+        if msg.kind is MsgType.command and msg.text.startswith('/in '):
+            self.in_command_handler(msg)
+            return
+
+        msg.reply('What do you want from me?')
+
+    def in_command_handler(self, msg: NMessage):
+        is_from_vk = msg.platform is Platform.vk
+        # Пропускаем первые 4 символа, обозначающие команду ("/in "), и берём остальное сообщение
+        phrase = msg.text[4:].strip()
+
+        # Берём нашего пользователя
+        n_user = User.get_or_none(User.state_param == phrase)
+
+        current_app.logger.info('Trying phrase "{}"'.format(phrase))
+
+        # Скорее всего такого пользователя нет, ну или фраза неправильная
+        if n_user is None:
+            msg.reply('I don\'n know what you\'re talking about.')
+            return
+
+        # Производим слияние двух аккаунтов в один (суммируем деньги, переводим друзей, etc.)
+        if is_from_vk:
+            msg.user.tg = n_user.tg
         else:
-            # Переход не случился
-            message.reply('You know how exactly I am. Now say my name.')
+            msg.user.vk = n_user.vk
 
-    # Основные состояния бота
-    elif state is UserState.base:
-        # Обрабатываем команды
-        if message.kind is MsgType.command:
+        # Теперь нам прошлый аккаунт не нужен 
+        # Удаляем, чтобы не создавать дублей в бд
+        n_user.delete_instance()
 
-            # Пользователь изъявил желание интегрироваться ещё с чем-то
-            if message.text == '/bind':
-                # Получаем ссылку на бота в разных системах
-                link = tg_link if is_from_vk else vk_link
+        # Ну и теперь уже сохраняем текущего пользователя
+        msg.user.save(force_insert=True)  # обязательно указываем force_insert, потому что мы поменяли ключевые поля
 
-                # Выбираем случайные 4 слова откуда-либо, главное случайные
-                phrase = get_random_phrase().lower()
+        # Теперь говорим пользователю, что же изменилось
+        msg.reply('Alright. Now I can talk to you in various kinds!')
 
-                # Меняем состояние машины и передаём дополнительный аргумент к состоянию
-                user.set_state(
-                    UserState.integrating_tg if is_from_vk else UserState.integrating_vk,
-                    phrase
-                )
-                user.save()
+        # Обязательно говорим, что кто-то совершил интеграцию
+        current_app.logger.info('{} integrated {}'.format(repr(msg.user), 'tg' if is_from_vk else 'vk'))
 
-                # Передаём пользователю инструкцию по интегрированию нового сервиса
-                message.reply(('Go to {}.\n'
-                               'When I\'ll have no doubt you are a good person to work with say\n'
-                               '\n'
-                               '/in {}\n'
-                               '\n'
-                               'Then I would be sure you have both channels to contact me, ok?').format(link, phrase))
 
-            # Обработка привязки одного аккаунта с другим
-            elif message.text.startswith('/in'):
+binding_msg = (
+    'Go to {}.\n'
+    'When I\'ll have no doubt you are a good person to work with say\n'
+    '\n'
+    '/in {}\n'
+    '\n'
+    'Then I would be sure you have both channels to contact me, ok?'
+)
 
-                # Пропускаем первые 4 символа, обозначающие команду ("/in "), и берём остальное сообщение
-                phrase = message.text[4:].strip()
 
-                # Берём нашего пользователя
-                n_user = User.get_or_none(User.state_param == phrase)
+class BindVKState(State):
+    def transition_rule(self, msg: NMessage):
+        if MsgType.command and msg.text == '/cancel':
+            return BaseState()
 
-                current_app.logger.info('Trying phrase "{}"'.format(phrase))
+        return None
 
-                # Скорее всего такого пользователя нет, ну или фраза неправильная
-                if n_user is None:
-                    message.reply('I don\'n know what you\'re talking about.')
-                    return
+    def leave(self, msg: NMessage):
+        # Отвечаем пользователю
+        msg.reply('Ok. I\'ll say to my boys that it\'s unnecessary')
 
-                # Производим слияние двух аккаунтов в один (суммируем деньги, переводим друзей, etc.)
-                if is_from_vk:
-                    user.tg = n_user.tg
-                else:
-                    user.vk = n_user.vk
+    def enter(self, msg: NMessage):
+        # Выбираем случайные 4 слова откуда-либо, главное случайные
+        phrase = get_random_phrase().lower()
 
-                # Теперь нам прошлый аккаунт не нужен, чтобы не создавать дублей в бд
-                n_user.delete_instance()
+        # Меняем состояние машины и передаём дополнительный аргумент к состоянию
+        msg.user.set_state(UserState.integrating_vk, phrase)
+        msg.user.save()
 
-                # Ну и теперь уже сохраняем текущего пользователя
-                user.set_state(UserState.base)
-                user.save(force_insert=True)  # обязательно указываем force_insert, потому что мы поменяли ключевые поля
+        # Передаём пользователю инструкцию по интегрированию нового сервиса
+        msg.reply(binding_msg.format(vk_link, phrase))
 
-                # Теперь говорим пользователю что же изменилось
-                message.reply('Alright. Now I can talk to you in various kinds!')
+    def stay(self, msg: NMessage):
+        # Переход не случился
+        msg.reply('I\'m waiting for you in other info channel. You only can /cancel it.')
 
-                # Обязательно говорим, что кто-то совершил интеграцию
-                current_app.logger.info(
-                    '{} integrated {}'.format(
-                        repr(user),
-                        'tg' if is_from_vk else 'vk'
-                    )
-                )
 
-        else:
-            message.reply('What do you want from me?')
+class BindTGState(BindVKState):
+    # В чём же прелесть ООП? В том, что не нужно копировать один и тот же код 1000 раз.
+    def enter(self, msg: NMessage):
+        # Выбираем случайные 4 слова откуда-либо, главное случайные
+        phrase = get_random_phrase().lower()
 
-    # Если пользователь ожидает интеграции, то он может только отменить
-    elif state in (UserState.integrating_vk, UserState.integrating_tg):
+        # Меняем состояние машины и передаём дополнительный аргумент к состоянию
+        msg.user.set_state(UserState.integrating_tg, phrase)
+        msg.user.save()
 
-        if cancel:
-            # Переводим нашего пользователя в статус авторизации
-            user.set_state(UserState.base)
-            user.save()
+        # Передаём пользователю инструкцию по интегрированию нового сервиса
+        msg.reply(binding_msg.format(tg_link, phrase))
 
-            # Приветствуем пользователя и сразу говорим, что он должен пройти обряд инициализации
-            message.reply('Ok. I\'ll say to my boys that it\'s unnecessary')
-        else:
-            # Даём пользователю инструкцию и пояснения текущего статуса
-            message.reply('I\'m waiting for you in other info channel. You only can /cancel it')
+
+class BotStateMachine(Machine):
+    map_states = {
+        UserState.initial: InitialState(),
+        UserState.authorizing: AuthorizingState(),
+        UserState.integrating_vk: BindVKState(),
+        UserState.integrating_tg: BindTGState(),
+    }
+
+    def get_initial_state(self, msg):
+        state = UserState(msg.user.state)
+
+        if state in self.map_states:
+            return self.map_states.get(state)
+
+        return BaseState()
+
+
+machine = BotStateMachine()
+
+
+def process_nmessage(message: NMessage):
+    machine.run(message)
