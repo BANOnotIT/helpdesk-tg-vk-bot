@@ -3,10 +3,10 @@ from enum import Enum
 
 class Api:
     def get_nmessage(self, message: dict):
-        raise TypeError('Unimplemented method `get_nmessage` in Api')
+        raise NotImplementedError()
 
     def message(self, to: str, message: str):
-        raise TypeError('Unimplemented method `message` in Api')
+        raise NotImplementedError()
 
 
 class MessageType(Enum):
@@ -31,7 +31,7 @@ class NMessage:
     platform = Platform.unknown
 
     def reply(self, message: str):
-        raise TypeError('Unimplemented method `message` in NMessage')
+        raise NotImplementedError()
 
     def __repr__(self):
         return '<Message {} from {}: {}>'.format(self.kind.name, self.user.__repr__(), self.text)
