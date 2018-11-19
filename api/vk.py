@@ -40,7 +40,10 @@ class VkApi(Api):
         if new:
             current_app.logger.info('Created new vk user: {}'.format(repr(user)))
 
-        return VkMessage(text, user, kind, vk_id, api=self)
+        message = VkMessage(text, user, kind, vk_id)
+        message.api = self
+
+        return message
 
     def exec(self, method: str, data: dict):
         settings = {
@@ -60,10 +63,7 @@ class VkApi(Api):
 
 class VkMessage(Message):
     platform = Platform.vk
-
-    def __init__(self, *args, api):
-        super().__init__(self, *args)
-        self.api = api
+    api = None
 
     def reply(self, message: str):
         return self.api.message(self.chat, message)

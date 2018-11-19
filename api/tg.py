@@ -38,9 +38,12 @@ class TgApi(Api):
             current_app.logger.info('Created new tg user: {}'.format(repr(user)))
 
         chat = int(message['chat']['id'])
-
         kind = self.get_message_kind(message)
-        return TgMessage(message.get('text', ''), user, kind, chat, api=self)
+
+        message = TgMessage(message.get('text', ''), user, kind, chat)
+        message.api = self
+
+        return message
 
     def exec(self, method: str, data: dict):
         return post(self.url + method, data).json()
@@ -56,10 +59,6 @@ class TgApi(Api):
 class TgMessage(Message):
     platform = Platform.tg
     api = None
-
-    def __init__(self, *args, api):
-        super().__init__(self, *args)
-        self.api = api
 
     def reply(self, message: str):
         return self.api.message(self.chat, message)
