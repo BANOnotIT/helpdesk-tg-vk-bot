@@ -6,7 +6,7 @@ class State:
         :param msg:
         :return: State or None
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def enter(self, msg):
         """
