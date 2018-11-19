@@ -1,15 +1,15 @@
 import logging
-from os import getenv
 
 from flask import Flask, request
 
 import db
 from api import TgApi, VkApi
 from bot_brains import process_nmessage
+from config import *
 
 app = Flask(__name__)
-tg_api = TgApi(getenv('TG_TOKEN'))
-vk_api = VkApi(getenv('VK_TOKEN'))
+tg_api = TgApi(tg_token)
+vk_api = VkApi(vk_token)
 
 # Инициализируем все таблички в бд
 db.create_tables()
@@ -60,7 +60,7 @@ def vkontakte():
     app.logger.info(repr(json))
 
     if json['type'] == 'confirmation':
-        return getenv('VK_VERIFY_SALT')
+        return vk_domain_verify_salt
 
     message = vk_api.get_nmessage(json)
     app.logger.info('Vkontakte message: {}'.format(message.__repr__()))

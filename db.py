@@ -1,20 +1,26 @@
-import os
 from enum import Enum, unique
 
 from peewee import Model, IntegerField, PostgresqlDatabase, TextField, CompositeKey
 from urllib3.util import parse_url
 
-db_url = parse_url(os.getenv('DATABASE_URL'))
+from config import *
 
-# Берём из auth имя пользователя и пароль от БД
-username, password = db_url.auth.split(':')
 
-database = PostgresqlDatabase(
-    db_url.path[1:],  # Пропускаем первый "/", так как он не является названием БД
-    host=db_url.host,
-    user=username,
-    password=password
-)
+def get_connection_params():
+    parsed_url = parse_url(db_url)
+
+    # Берём из auth имя пользователя и пароль от БД
+    username, password = parsed_url.auth.split(':')
+
+    return dict(
+        database=parsed_url.path[1:],  # Пропускаем первый "/", так как он не является названием БД
+        host=parsed_url.host,
+        user=username,
+        password=password
+    )
+
+
+database = PostgresqlDatabase(get_connection_params())
 
 
 @unique

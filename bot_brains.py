@@ -1,12 +1,9 @@
 from flask import current_app
 
 from api import NMessage, MessageType as MsgType, Platform
+from config import *
 from db import UserState, User
 from utils import get_random_phrase
-
-# Ссылки на нашего бота в разных системах
-tg_link = 'https://t.me/itsolschool_heizenberg_bot'
-vk_link = 'https://vk.com/im?sel=-174147611'
 
 
 def process_nmessage(message: NMessage):
