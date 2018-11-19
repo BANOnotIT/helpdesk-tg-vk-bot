@@ -64,4 +64,4 @@ class Machine:
 
         # Перехода не случилось, значит возможно в текущем состоянии есть что сделать.
         else:
-            init_state.stay()
+            init_state.stay(msg)
