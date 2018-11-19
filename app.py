@@ -4,7 +4,7 @@ from flask import Flask, request
 
 import db
 from api import TgApi, VkApi
-from bot_brains import process_nmessage
+from bot_brains2 import process_nmessage
 from config import *
 
 app = Flask(__name__)
