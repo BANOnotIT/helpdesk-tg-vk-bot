@@ -6,21 +6,21 @@ from urllib3.util import parse_url
 from config import *
 
 
-def get_connection_params():
+def get_database():
     parsed_url = parse_url(db_url)
 
     # Берём из auth имя пользователя и пароль от БД
     username, password = parsed_url.auth.split(':')
 
-    return dict(
-        database=parsed_url.path[1:],  # Пропускаем первый "/", так как он не является названием БД
+    return PostgresqlDatabase(
+        parsed_url.path[1:],  # Пропускаем первый "/", так как он не является названием БД
         host=parsed_url.host,
         user=username,
         password=password
     )
 
 
-database = PostgresqlDatabase(get_connection_params())
+database = get_database()
 
 
 @unique
