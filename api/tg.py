@@ -31,7 +31,7 @@ class TgApi(Api):
         else:
             return EMessageType.unknown
 
-    def get_nmessage(self, message):
+    def get_message(self, message):
         user, new = User.get_or_create(tg=int(message['from']['id']))
 
         if new:

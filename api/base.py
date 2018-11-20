@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Api:
-    def get_nmessage(self, message: dict):
+    def get_message(self, message: dict):
         raise NotImplementedError()
 
     def message(self, to: str, message: str):

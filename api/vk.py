@@ -13,7 +13,7 @@ class VkApi(Api):
         self.token = token
         self.url = self.url.format(token)
 
-    def get_nmessage(self, message):
+    def get_message(self, message):
 
         vk_id = 0
         kind = EMessageType.unknown
