@@ -21,7 +21,7 @@ def before_request():
 
 
 @app.teardown_appcontext
-def after_request():
+def teardown_appcontext(*args):
     db.database.close()
 
 
