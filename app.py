@@ -17,13 +17,12 @@ db.create_tables()
 
 @app.before_request
 def before_request():
-    db.database.connect()
+    db.database.connect(reuse_if_open=True)
 
 
-@app.after_request
-def after_request(response):
+@app.teardown_appcontext
+def after_request():
     db.database.close()
-    return response
 
 
 # Логируем все что у нас есть в gunicorn, чтобы было видно в консоли
