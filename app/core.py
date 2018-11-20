@@ -1,9 +1,9 @@
 from flask import current_app
 
-from api import Message, EMessageType as MsgType, EPlatform
+from .api import Message, EMessageType as MsgType, EPlatform
 from config import *
 from .db import EUserState, User
-from state_machine import State, Machine
+from .state_machine import State, Machine
 from .utils import get_random_phrase
 
 
