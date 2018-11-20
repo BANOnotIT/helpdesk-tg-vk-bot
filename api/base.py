@@ -2,14 +2,14 @@ from enum import Enum
 
 
 class Api:
-    def get_nmessage(self, message: dict):
+    def get_message(self, message: dict):
         raise NotImplementedError()
 
     def message(self, to: str, message: str):
         raise NotImplementedError()
 
 
-class MessageType(Enum):
+class EMessageType(Enum):
     unknown = 0
     text = 1
     command = 2
@@ -17,18 +17,24 @@ class MessageType(Enum):
     leaved = 4
 
 
-class Platform(Enum):
+class EPlatform(Enum):
     unknown = 0
     tg = 1
     vk = 2
 
 
-class NMessage:
+class Message:
     text = ''
-    kind = MessageType.unknown
+    kind = EMessageType.unknown
     user = None  # User
     chat = None
-    platform = Platform.unknown
+    platform = EPlatform.unknown
+
+    def __init__(self, text, user, kind, chat):
+        self.text = text
+        self.user = user
+        self.kind = kind
+        self.chat = chat
 
     def reply(self, message: str):
         raise NotImplementedError()

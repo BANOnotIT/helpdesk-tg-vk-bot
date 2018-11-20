@@ -2,7 +2,7 @@ from flask import current_app
 from requests import post
 
 from db import User
-from .base import Api, NMessage, MessageType, Platform
+from .base import Api, EMessageType, Message, EPlatform
 
 
 class TgApi(Api):
@@ -13,16 +13,37 @@ class TgApi(Api):
         self.token = token
         self.url = self.url.format(token)
 
-    def get_nmessage(self, message):
+    @staticmethod
+    def get_message_kind(message):
+        if message.get('text'):
+            if message['text'].startswith('/'):
+                return EMessageType.command
+
+            else:
+                return EMessageType.text
+
+        elif message.get('new_chat_member'):
+            return EMessageType.joined
+
+        elif message.get('left_chat_member'):
+            return EMessageType.leaved
+
+        else:
+            return EMessageType.unknown
+
+    def get_message(self, message):
         user, new = User.get_or_create(tg=int(message['from']['id']))
 
         if new:
             current_app.logger.info('Created new tg user: {}'.format(repr(user)))
 
         chat = int(message['chat']['id'])
+        kind = self.get_message_kind(message)
 
-        kind = TgMessage.get_kind(message)
-        return TgMessage(message.get('text', ''), user, self, kind, chat)
+        message = TgMessage(message.get('text', ''), user, kind, chat)
+        message.api = self
+
+        return message
 
     def exec(self, method: str, data: dict):
         return post(self.url + method, data).json()
@@ -35,33 +56,9 @@ class TgApi(Api):
         })
 
 
-class TgMessage(NMessage):
-    platform = Platform.tg
-
-    def __init__(self, text, user, api, kind, chat):
-        self.api = api
-        self.text = text
-        self.user = user
-        self.kind = kind
-        self.chat = chat
-
-    @staticmethod
-    def get_kind(message):
-        if message.get('text'):
-            if message['text'].startswith('/'):
-                return MessageType.command
-
-            else:
-                return MessageType.text
-
-        elif message.get('new_chat_member'):
-            return MessageType.joined
-
-        elif message.get('left_chat_member'):
-            return MessageType.leaved
-
-        else:
-            return MessageType.unknown
+class TgMessage(Message):
+    platform = EPlatform.tg
+    api = None
 
     def reply(self, message: str):
         return self.api.message(self.chat, message)

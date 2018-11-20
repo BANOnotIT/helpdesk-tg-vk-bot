@@ -44,7 +44,7 @@ def telegram():
     json = request.get_json()
 
     if json.get('message'):
-        message = tg_api.get_nmessage(json['message'])
+        message = tg_api.get_message(json['message'])
         app.logger.info('Telegram message: {}'.format(message.__repr__()))
         process_nmessage(message)
 
@@ -61,7 +61,7 @@ def vkontakte():
     if json['type'] == 'confirmation':
         return vk_domain_verify_salt
 
-    message = vk_api.get_nmessage(json)
+    message = vk_api.get_message(json)
     app.logger.info('Vkontakte message: {}'.format(message.__repr__()))
     process_nmessage(message)
 
