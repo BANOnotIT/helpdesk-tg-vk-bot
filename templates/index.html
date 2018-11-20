@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heizenberg Bot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+    <div class="container-wrapper">
+        <header class="content-box -header">
+            <h1 class="headline -main">Heizenberg Bot</h1>
+
+            <div class="main-links u-row">
+                <a class="link" href="{{ tg_link }}" target="_blank">
+                    <img class="logo"
+                         src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+                    <span class="name">Telegram</span>
+                </a>
+                <a class="link" href="{{ vk_link }}" target="_blank">
+                    <img class="logo"
+                         src="https://upload.wikimedia.org/wikipedia/commons/2/21/VK.com-logo.svg" alt="VK">
+                    <span class="name">Вконтакте</span>
+                </a>
+            </div>
+        </header>
+    </div>
+    <div class="container-wrapper -instructions">
+        <section class="content-box">
+            <h2 class="headline">Возможности</h2>
+            <dl class="commands-list">
+                <dt class="def">/bind</dt>
+                <dd class="info">
+                    Привязка другого аккаунта к текущему
+                </dd>
+
+                <dt class="def">/cancel</dt>
+                <dd class="info">
+                    Отмена текущей операции
+                </dd>
+            </dl>
+        </section>
+    </div>
+    <div class="footer-block">
+        <div class="container-wrapper ">
+            <section class="content-box -minimal">
+                <div class="footer-links">
+                    <a href="https://github.com/BANOnotIT/helpdesk">Обратная связь</a>
+                    <a href="https://guthub.com/BANOnotIT/helpdesk-tg-vk-bot">Исходные коды</a>
+                    <div class="u-divider"></div>
+                    <span>
+                    &copy; 2018 BANOnotIT
+                    </span>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+</body>
+</html>

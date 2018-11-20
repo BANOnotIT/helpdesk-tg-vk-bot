@@ -1,23 +1,25 @@
 import logging
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 from config import *
 from .api import TgApi, VkApi
 from .core import process_nmessage
 from .db import create_tables, database
 
-flask_app = Flask(__name__)
+flask_app = Flask(__name__, static_folder='../static', template_folder='../templates')
 tg_api = TgApi(tg_token)
 vk_api = VkApi(vk_token)
 
+
 # Инициализируем все таблички в бд
-create_tables()
+# create_tables()
 
 
 @flask_app.before_request
 def before_request():
-    database.connect(reuse_if_open=True)
+    pass
+    # database.connect(reuse_if_open=True)
 
 
 @flask_app.teardown_appcontext
@@ -35,7 +37,7 @@ if __name__ != '__main__':
 
 @flask_app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return render_template('index.html', tg_link=tg_link, vk_link=vk_link)
 
 
 # Обрабатываем телеграмовы сообщения

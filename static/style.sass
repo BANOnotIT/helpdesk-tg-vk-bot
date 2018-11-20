@@ -1,0 +1,136 @@
+$grey-900: #222
+$grey-500: #777
+//$grey-200: #
+$grey-100: #f0f0f0
+
+$code: #75231d
+
+body, html
+  margin: 0
+  padding: 0
+  color: $grey-900
+
+*
+  -webkit-box-sizing: border-box
+  -moz-box-sizing: border-box
+  box-sizing: border-box
+
+.u-row
+  display: flex
+  //flex-wrap: nowrap
+  flex-direction: row
+  > *
+    flex: 1
+
+.u-divider
+  flex: 100%
+
+.u-col
+  display: flex
+  //flex-wrap: nowrap
+  flex-direction: column
+  > *
+    flex: 1
+
+main
+  font-family: sans-serif
+
+.container-wrapper
+  margin: 0 auto
+  max-width: 50em
+  padding: 0 2em
+  @media (max-width: 425px)
+    max-width: 100%
+
+//&.-instructions
+  //background: $grey-100
+
+.content-box
+  border: solid transparent 1px
+  min-height: 70vh
+  margin-bottom: 4em
+
+  @media (max-width: 768px)
+    font-size: .7em
+
+  @media (max-width: 425px)
+    font-size: .5em
+    margin-bottom: 2em
+    min-height: 0
+
+  &.-minimal
+    min-height: 40vh
+    margin-bottom: 0
+    @media (max-width: 768px)
+      min-height: 0
+
+  > .headline
+    text-align: center
+    font-size: 4em
+
+  &.-header
+    > .headline.-main
+      font-size: 6em
+
+.main-links
+  > .link
+    transform: scale(1)
+    color: $grey-500
+    display: block
+    text-align: center
+    transition: all .4s ease-in-out
+    text-decoration: none
+    margin-bottom: 1em
+
+    &:hover, &:active, &:focus
+      transform: scale(1.4)
+
+    > .logo
+      width: 50%
+      margin: 0 auto
+
+    > .name
+      display: block
+
+.commands-list
+  background: $grey-100
+  border-radius: 1em
+  padding: 5em
+  font-size: 1.7em
+  //border: solid 1px $grey-500
+
+
+  @media (max-width: 768px)
+    padding: 3em
+    border-radius: 1em
+
+  @media (max-width: 425px)
+    padding: 2em
+    border-radius: 1em
+
+  > .def
+    font-family: monospace
+    color: $code
+
+  > .info
+    color: $grey-500
+    font-style: italic
+    margin-bottom: 1em
+
+.footer-block
+  padding: 4em 0
+  background: $grey-900
+  font-size: 1.4em
+  color: $grey-100
+
+.footer-links
+  margin: 0 auto
+  line-height: 1.4
+  //display: flex
+  //flex-direction: column
+  > a, > span
+    display: block
+    color: $grey-100
+    text-decoration: none
+    &:hover
+      text-decoration: underline
