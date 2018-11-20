@@ -2,9 +2,9 @@ from flask import current_app
 
 from api import Message, EMessageType as MsgType, EPlatform
 from config import *
-from db import EUserState, User
+from .db import EUserState, User
 from state_machine import State, Machine
-from utils import get_random_phrase
+from .utils import get_random_phrase
 
 
 class InitialState(State):

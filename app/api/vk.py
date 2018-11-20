@@ -1,7 +1,7 @@
 from flask import current_app
 from requests import post
 
-from db import User
+from ..db import User
 from .base import Api, EMessageType, Message, EPlatform
 
 
