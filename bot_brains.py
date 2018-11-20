@@ -15,9 +15,6 @@ def process_nmessage(message: NMessage):
     # Пользователь пожелал отменить текущее действие
     cancel = message.kind is MsgType.command and message.text == '/cancel'
 
-    if 'just fail' in message.text:
-        raise Exception()
-
     # Пользователь пришёл в первый раз и вообще это его первое сообщение
     if state is UserState.initial:
         # Переводим нашего пользователя в статус авторизации
