@@ -9,7 +9,7 @@ class Api:
         raise NotImplementedError()
 
 
-class MessageType(Enum):
+class EMessageType(Enum):
     unknown = 0
     text = 1
     command = 2
@@ -17,7 +17,7 @@ class MessageType(Enum):
     leaved = 4
 
 
-class Platform(Enum):
+class EPlatform(Enum):
     unknown = 0
     tg = 1
     vk = 2
@@ -25,10 +25,10 @@ class Platform(Enum):
 
 class Message:
     text = ''
-    kind = MessageType.unknown
+    kind = EMessageType.unknown
     user = None  # User
     chat = None
-    platform = Platform.unknown
+    platform = EPlatform.unknown
 
     def __init__(self, text, user, kind, chat):
         self.text = text

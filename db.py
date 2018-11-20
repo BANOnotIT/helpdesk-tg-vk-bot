@@ -24,7 +24,7 @@ database = get_database()
 
 
 @unique
-class UserState(Enum):
+class EUserState(Enum):
     initial = 0
     authorizing = 1
     base = 2
@@ -40,16 +40,16 @@ class UserState(Enum):
 class User(Model):
     tg = IntegerField(default=0, help_text='Telegram User Id')
     vk = IntegerField(default=0, help_text='VK User Id')
-    state = IntegerField(default=UserState.initial.value, choices=UserState.as_choices(),
+    state = IntegerField(default=EUserState.initial.value, choices=EUserState.as_choices(),
                          help_text='Current bot state for user')
     state_param = TextField(default='', help_text='Param for state')
 
-    def set_state(self, state: UserState, param=''):
+    def set_state(self, state: EUserState, param=''):
         self.state = state.value
         self.state_param = param
 
     def __repr__(self):
-        return '<User tg={} vk={} state={}:{}>'.format(self.tg, self.vk, UserState(self.state).name,
+        return '<User tg={} vk={} state={}:{}>'.format(self.tg, self.vk, EUserState(self.state).name,
                                                        self.state_param)
 
     class Meta:

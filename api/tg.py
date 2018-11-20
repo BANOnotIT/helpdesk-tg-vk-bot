@@ -2,7 +2,7 @@ from flask import current_app
 from requests import post
 
 from db import User
-from .base import Api, MessageType, Message, Platform
+from .base import Api, EMessageType, Message, EPlatform
 
 
 class TgApi(Api):
@@ -17,19 +17,19 @@ class TgApi(Api):
     def get_message_kind(message):
         if message.get('text'):
             if message['text'].startswith('/'):
-                return MessageType.command
+                return EMessageType.command
 
             else:
-                return MessageType.text
+                return EMessageType.text
 
         elif message.get('new_chat_member'):
-            return MessageType.joined
+            return EMessageType.joined
 
         elif message.get('left_chat_member'):
-            return MessageType.leaved
+            return EMessageType.leaved
 
         else:
-            return MessageType.unknown
+            return EMessageType.unknown
 
     def get_nmessage(self, message):
         user, new = User.get_or_create(tg=int(message['from']['id']))
@@ -57,7 +57,7 @@ class TgApi(Api):
 
 
 class TgMessage(Message):
-    platform = Platform.tg
+    platform = EPlatform.tg
     api = None
 
     def reply(self, message: str):

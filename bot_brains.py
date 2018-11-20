@@ -1,8 +1,8 @@
 from flask import current_app
 
-from api import Message, MessageType as MsgType, Platform
+from api import Message, EMessageType as MsgType, EPlatform
 from config import *
-from db import UserState, User
+from db import EUserState, User
 from state_machine import State, Machine
 from utils import get_random_phrase
 
@@ -25,7 +25,7 @@ class AuthorizingState(State):
 
     def enter(self, msg: Message):
         # Переводим нашего пользователя в статус авторизации
-        msg.user.set_state(UserState.authorizing)
+        msg.user.set_state(EUserState.authorizing)
         msg.user.save()
 
         # Приветствуем пользователя и сразу говорим, что он должен пройти обряд инициализации
@@ -41,13 +41,13 @@ class BaseState(State):
         command = msg.kind is MsgType.command
 
         if command and msg.text == '/bind':
-            return BindTGState() if msg.platform is Platform.vk else BindVKState()
+            return BindTGState() if msg.platform is EPlatform.vk else BindVKState()
 
         return None
 
     def enter(self, msg: Message):
         user = msg.user
-        user.set_state(UserState.base)
+        user.set_state(EUserState.base)
         user.save()
 
     def stay(self, msg: Message):
@@ -58,7 +58,7 @@ class BaseState(State):
         msg.reply('What do you want from me?')
 
     def in_command_handler(self, msg: Message):
-        is_from_vk = msg.platform is Platform.vk
+        is_from_vk = msg.platform is EPlatform.vk
         # Пропускаем первые 4 символа, обозначающие команду ("/in "), и берём остальное сообщение
         phrase = msg.text[4:].strip()
 
@@ -118,7 +118,7 @@ class BindVKState(State):
         phrase = get_random_phrase().lower()
 
         # Меняем состояние машины и передаём дополнительный аргумент к состоянию
-        msg.user.set_state(UserState.integrating_vk, phrase)
+        msg.user.set_state(EUserState.integrating_vk, phrase)
         msg.user.save()
 
         # Передаём пользователю инструкцию по интегрированию нового сервиса
@@ -136,7 +136,7 @@ class BindTGState(BindVKState):
         phrase = get_random_phrase().lower()
 
         # Меняем состояние машины и передаём дополнительный аргумент к состоянию
-        msg.user.set_state(UserState.integrating_tg, phrase)
+        msg.user.set_state(EUserState.integrating_tg, phrase)
         msg.user.save()
 
         # Передаём пользователю инструкцию по интегрированию нового сервиса
@@ -145,14 +145,14 @@ class BindTGState(BindVKState):
 
 class BotStateMachine(Machine):
     map_states = {
-        UserState.initial: InitialState(),
-        UserState.authorizing: AuthorizingState(),
-        UserState.integrating_vk: BindVKState(),
-        UserState.integrating_tg: BindTGState(),
+        EUserState.initial: InitialState(),
+        EUserState.authorizing: AuthorizingState(),
+        EUserState.integrating_vk: BindVKState(),
+        EUserState.integrating_tg: BindTGState(),
     }
 
     def get_initial_state(self, msg):
-        state = UserState(msg.user.state)
+        state = EUserState(msg.user.state)
 
         if state in self.map_states:
             return self.map_states.get(state)
